@@ -17,9 +17,33 @@ trait HasLangueTrait
         'siteheader:read', 'siteheader:write',
         'sitereseau:read','sitereseau:write',
         'sitetopimage:read','sitetopimage:write',
-        'siteaboutus:read','siteaboutus:write'
+        'siteaboutus:read','siteaboutus:write',
+        'siteaboutticket:read','siteaboutticket:write',
+        'sitewewhat:read', 'sitewewhat:write',
+        'sitewewhatticket:read','sitewewhatticket:write',
+        'siteourprogram:read','siteourprogram:write',
+        'siteevent:read','siteevent:write',
+        'siteeventticket:read','siteeventticket:write',
+        'sitefooter:read','sitefooter:write'
         ])]
     private ?Langue $langue = null;
+
+    
+    #[ORM\Column(length: 255, nullable: true)]
+        #[Groups([
+        'siteheader:read', 'siteheader:write',
+        'sitereseau:read','sitereseau:write',
+        'sitetopimage:read','sitetopimage:write',
+        'siteaboutus:read','siteaboutus:write',
+        'siteaboutticket:read','siteaboutticket:write',
+        'sitewewhat:read', 'sitewewhat:write',
+        'sitewewhatticket:read','sitewewhatticket:write',
+        'siteourprogram:read','siteourprogram:write',
+        'siteevent:read','siteevent:write',
+        'siteeventticket:read','siteeventticket:write',
+        'sitefooter:read','sitefooter:write'
+        ])]
+    private ?string $lienPage = null;
 
     public function getLangue(): ?Langue
     {
@@ -29,6 +53,18 @@ trait HasLangueTrait
     public function setLangue(?Langue $langue): static
     {
         $this->langue = $langue;
+        return $this;
+    }
+
+        public function getLienPage(): ?string
+    {
+        return $this->lienPage;
+    }
+
+    public function setLienPage(?string $lienPage): static
+    {
+        $this->lienPage = $lienPage;
+
         return $this;
     }
 }

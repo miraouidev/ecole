@@ -17,7 +17,8 @@ class Langue
     private ?int $id = null;
 
     #[ORM\Column(length: 5)]
-    #[Groups(['siteheader:read','sitereseau:read','sitetopimage:read','siteaboutus:read'])]
+    #[Groups(['siteheader:read','sitereseau:read','sitetopimage:read','siteaboutus:read','siteaboutticket:read','sitewewhat:read',
+    'sitewewhatticket:read','siteourprogram:read','siteevent:read','siteeventticket:read','sitefooter:read'])]
 
     private ?string $code = null;
 

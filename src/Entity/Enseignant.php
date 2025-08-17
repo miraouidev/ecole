@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
+use App\Entity\Traits\PersonTrait;
 use App\Repository\EnseignantRepository;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -18,6 +19,7 @@ class Enseignant
     #[ORM\ManyToOne]
     private ?Civilite $civilite = null;
 
+    use PersonTrait;
     public function getId(): ?int
     {
         return $this->id;

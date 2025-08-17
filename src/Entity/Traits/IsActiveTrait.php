@@ -12,7 +12,16 @@ trait IsActiveTrait
     'siteheader:read', 'siteheader:write',
     'sitereseau:read','sitereseau:write',
     'sitetopimage:read','sitetopimage:write',
-    'siteaboutus:read','siteaboutus:write'
+    'siteaboutus:read','siteaboutus:write',
+    'siteaboutticket:read','siteaboutticket:write',
+    'sitewewhat:read', 'sitewewhat:write',
+    'sitewewhatticket:read','sitewewhatticket:write',
+    'siteourprogram:read','siteourprogram:write',
+    'siteevent:read','siteevent:write',
+    'siteeventticket:read','siteeventticket:write',
+    'siteourteams:read','siteourteams:write',
+    'sitefooter:read','sitefooter:write',
+    'sitepage:read','sitepage:write'
     ])]
 
     private ?bool $isActive = null;

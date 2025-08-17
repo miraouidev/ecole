@@ -11,24 +11,24 @@ use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use App\Entity\Traits\HasLangueTrait;
 use App\Entity\Traits\IsActiveTrait;
-use App\Repository\SiteEventRepository;
+use App\Repository\SiteFooterRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 
-#[ORM\Entity(repositoryClass: SiteEventRepository::class)]
+#[ORM\Entity(repositoryClass: SiteFooterRepository::class)]
 #[ApiResource(
     routePrefix: '/site',
     operations: [
-        new Get(),            // GET    /api/site/site_events/{id}
-        new GetCollection(),  // GET    /api/site/site_events
-        new Post(),           // POST   /api/site/site_events
-        new Patch(),          // PATCH  /api/site/site_events/{id}
+        new Get(),
+        new GetCollection(),
+        new Post(),
+        new Patch(),
     ],
     normalizationContext: [
-        'groups' => ['siteevent:read'],
+        'groups' => ['sitefooter:read'],
         'skip_null_values' => false
     ],
-    denormalizationContext: ['groups' => ['siteevent:write']],
+    denormalizationContext: ['groups' => ['sitefooter:write']],
     paginationEnabled: true,
     paginationItemsPerPage: 10
 )]
@@ -36,31 +36,22 @@ use Symfony\Component\Serializer\Annotation\Groups;
     'isActive' => 'exact',
     'langue.code' => 'exact',
 ])]
-class SiteEvent
+class SiteFooter
 {
-    /// for section 6
-
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['siteevent:read'])]
+    #[Groups(['sitefooter:read'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(['siteevent:read','siteevent:write'])]
-    private ?string $titre = null;
-
-    #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(['siteevent:read','siteevent:write'])]
+    #[Groups(['sitefooter:read','sitefooter:write'])]
     private ?string $text = null;
 
-    use IsActiveTrait;   // ensure trait has groups for this resource if you want it exposed
-    use HasLangueTrait;  // relation to Langue (usually write group in trait)
+    use IsActiveTrait;   // ensure trait has groups for this resource
+    use HasLangueTrait;  // ensure trait sets write group for langue relation
 
     public function getId(): ?int { return $this->id; }
-
-    public function getTitre(): ?string { return $this->titre; }
-    public function setTitre(?string $titre): static { $this->titre = $titre; return $this; }
 
     public function getText(): ?string { return $this->text; }
     public function setText(?string $text): static { $this->text = $text; return $this; }
