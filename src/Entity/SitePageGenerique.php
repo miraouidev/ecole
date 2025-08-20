@@ -64,7 +64,6 @@ class SitePageGenerique
     #[ORM\Column(length: 255, nullable: true)]
     #[Groups(['sitepage:read','sitepage:write'])]
     #[Assert\Length(max: 255)]
-    #[Assert\Url(protocols: ['http','https'], message: 'Invalid image URL.')]
     private ?string $linkImage = null;
     
 

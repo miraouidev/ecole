@@ -1,14 +1,16 @@
 api_platform:
     title: Hello API Platform
     version: 1.0.0
+
     formats:
         jsonld: ['application/ld+json']
         json: ['application/json']
 
     patch_formats:
-        json: ['application/json']              # allow PATCH with normal JSON
-        jsonld: ['application/ld+json']         # optional, if you want JSON-LD for patch too
-        jsonmergepatch: ['application/merge-patch+json'] # default merge-patch
+        json: ['application/json']              
+        jsonld: ['application/ld+json']         
+        jsonmergepatch: ['application/merge-patch+json'] 
+
     defaults:
         stateless: true
         cache_headers:

@@ -49,9 +49,12 @@ final class WebsiteController extends AbstractController
     {
         $code = strtolower($code);
 
+
         // Cache key per language
         $cacheKey = sprintf('website_payload_%s', $code);
+//$this->cache->delete($cacheKey); // Clear cache for testing
 
+        // Use cache to avoid multiple DB queries
         $payload = $this->cache->get($cacheKey, function (CacheItemInterface $item) use ($code) {
 
             // Cache TTL (adjust as you like)
@@ -200,7 +203,21 @@ final class WebsiteController extends AbstractController
         );
     }
 
-    #[Route('/website/page-generique', name: 'website_by_langue', methods: ['POST'])]
+        #[Route('/website/valide/{code}', name: 'website_by_langue', methods: ['GET'])]
+    public function valideChange(string $code): JsonResponse
+    {
+        $code = strtolower($code);
+        // Cache key per language
+        $cacheKey = sprintf('website_payload_%s', $code);
+        $this->cache->delete($cacheKey); // Clear cache for testing
+
+        return $this->json(
+            ['message' => 'Valider pour langue: ' . $code],
+            200
+        );
+    }
+
+    #[Route('/website/page-generique', name: 'website_page', methods: ['POST'])]
     public function getWebPage(Request $request,SitePageGeneriqueRepository $repo): JsonResponse
     {
         $data = json_decode($request->getContent(), true);

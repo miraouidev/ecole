@@ -3,31 +3,40 @@
 namespace App\Entity\Traits;
 
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Attribute\Groups;
 
 trait PersonTrait
 {
     #[ORM\Column(length: 100)]
+    #[Groups(['admin:read', 'admin:write','admin:patch'])]
     private ?string $nom = null;
 
     #[ORM\Column(length: 100)]
+    #[Groups(['admin:read', 'admin:write','admin:patch'])]
     private ?string $prenom = null;
 
     #[ORM\Column(nullable: true)]
+    #[Groups(['admin:read', 'admin:write','admin:patch'])]
     private ?\DateTimeImmutable $dateNai = null;
 
     #[ORM\Column(nullable: true)]
+    #[Groups(['admin:read', 'admin:write','admin:patch'])]
     private ?\DateTimeImmutable $startAt = null;
 
     #[ORM\Column(length: 15, nullable: true)]
+    #[Groups(['admin:read', 'admin:write','admin:patch'])]
     private ?string $cin = null;
 
     #[ORM\Column(length: 15, nullable: true)]
+    #[Groups(['admin:read', 'admin:write','admin:patch'])]
     private ?string $phone = null;
 
     #[ORM\Column(length: 15, nullable: true)]
+    #[Groups(['admin:read', 'admin:write','admin:patch'])]
     private ?string $mobile = null;
 
     #[ORM\Column(length: 255, nullable: true)]
+    #[Groups(['admin:read', 'admin:write','admin:patch'])]
     private ?string $adresse = null;
 
     public function getNom(): ?string { return $this->nom; }

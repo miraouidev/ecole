@@ -22,13 +22,6 @@ use Symfony\Component\Serializer\Annotation\Groups;
         new GetCollection(),           // GET /media
         new Delete(),                  // DELETE /media/{id} — physical file removal handled by processor (below)
         // Custom multipart upload endpoint:
-        new Post(
-            controller: MediaController::class,
-            name: 'media_upload',
-            uriTemplate: '/media/upload',
-            deserialize: false,        // we'll read Request manually (form-data)
-            validate: false            // we’ll do simple checks in controller
-        )
     ],
     normalizationContext: ['groups' => ['media:read']],
     denormalizationContext: ['groups' => ['media:write']],

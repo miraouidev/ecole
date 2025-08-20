@@ -4,5 +4,5 @@ controllers:
         namespace: App\Controller
     type: attribute
 api_login:
-    path: /api/login
+    path: /auth/login
     methods: [POST]

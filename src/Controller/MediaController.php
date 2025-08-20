@@ -10,11 +10,14 @@ use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Attribute\AsController;
+use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\String\Slugger\SluggerInterface;
 
 #[AsController]
 class MediaController extends AbstractController
 {
+    
+    #[Route('/api/media/upload', name: 'image_upload', methods: ['POST'])]
     public function __invoke(
         Request $request,
         EntityManagerInterface $em,

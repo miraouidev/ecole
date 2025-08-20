@@ -7,24 +7,24 @@ use Symfony\Component\Serializer\Annotation\Groups;
 
 trait IsActiveTrait
 {
-    #[ORM\Column(type: 'boolean')]
+    #[ORM\Column(type: 'boolean', options: ['default' => true])]
     #[Groups([
-    'siteheader:read', 'siteheader:write',
-    'sitereseau:read','sitereseau:write',
-    'sitetopimage:read','sitetopimage:write',
-    'siteaboutus:read','siteaboutus:write',
-    'siteaboutticket:read','siteaboutticket:write',
-    'sitewewhat:read', 'sitewewhat:write',
-    'sitewewhatticket:read','sitewewhatticket:write',
-    'siteourprogram:read','siteourprogram:write',
-    'siteevent:read','siteevent:write',
-    'siteeventticket:read','siteeventticket:write',
-    'siteourteams:read','siteourteams:write',
-    'sitefooter:read','sitefooter:write',
-    'sitepage:read','sitepage:write'
+        'siteheader:read', 'siteheader:write',
+        'sitereseau:read','sitereseau:write',
+        'sitetopimage:read','sitetopimage:write',
+        'siteaboutus:read','siteaboutus:write',
+        'siteaboutticket:read','siteaboutticket:write',
+        'sitewewhat:read', 'sitewewhat:write',
+        'sitewewhatticket:read','sitewewhatticket:write',
+        'siteourprogram:read','siteourprogram:write',
+        'siteevent:read','siteevent:write',
+        'siteeventticket:read','siteeventticket:write',
+        'siteourteams:read','siteourteams:write',
+        'sitefooter:read','sitefooter:write',
+        'sitepage:read','sitepage:write',
+        'user:read', 'user:write','user:patch',
     ])]
-
-    private ?bool $isActive = null;
+    private ?bool $isActive = true;
 
     public function isActive(): ?bool
     {
