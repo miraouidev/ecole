@@ -10,7 +10,7 @@ use Doctrine\Migrations\AbstractMigration;
 /**
  * Auto-generated Migration: Please modify to your needs!
  */
-final class Version20250820144901 extends AbstractMigration
+final class Version20250820162302 extends AbstractMigration
 {
     public function getDescription(): string
     {
@@ -35,6 +35,7 @@ final class Version20250820144901 extends AbstractMigration
         $this->addSql('CREATE TABLE niveau (id INT AUTO_INCREMENT NOT NULL, nom VARCHAR(100) NOT NULL, is_active TINYINT(1) NOT NULL, PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
         $this->addSql('CREATE TABLE parent_eleve_relation (id INT AUTO_INCREMENT NOT NULL, eleve_id INT DEFAULT NULL, parent_id INT NOT NULL, INDEX IDX_68B9D536A6CC7B2 (eleve_id), INDEX IDX_68B9D536727ACA70 (parent_id), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
         $this->addSql('CREATE TABLE parent_profile (id INT AUTO_INCREMENT NOT NULL, civilite_id INT DEFAULT NULL, nom VARCHAR(100) NOT NULL, prenom VARCHAR(100) NOT NULL, date_nai DATETIME DEFAULT NULL COMMENT \'(DC2Type:datetime_immutable)\', start_at DATETIME DEFAULT NULL COMMENT \'(DC2Type:datetime_immutable)\', cin VARCHAR(15) DEFAULT NULL, phone VARCHAR(15) DEFAULT NULL, mobile VARCHAR(15) DEFAULT NULL, adresse VARCHAR(255) DEFAULT NULL, INDEX IDX_F31FDE4939194ABF (civilite_id), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
+        $this->addSql('CREATE TABLE refresh_tokens (id INT AUTO_INCREMENT NOT NULL, refresh_token VARCHAR(128) NOT NULL, username VARCHAR(255) NOT NULL, valid DATETIME NOT NULL, UNIQUE INDEX UNIQ_9BACE7E1C74F2195 (refresh_token), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
         $this->addSql('CREATE TABLE site (id INT AUTO_INCREMENT NOT NULL, name VARCHAR(255) DEFAULT NULL, PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
         $this->addSql('CREATE TABLE site_about_ticket (id INT AUTO_INCREMENT NOT NULL, langue_id INT NOT NULL, titre VARCHAR(255) DEFAULT NULL, is_active TINYINT(1) DEFAULT 1 NOT NULL, lien_page VARCHAR(255) DEFAULT NULL, INDEX IDX_4A2D87112AADBACD (langue_id), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
         $this->addSql('CREATE TABLE site_about_us (id INT AUTO_INCREMENT NOT NULL, langue_id INT NOT NULL, link_video VARCHAR(255) DEFAULT NULL, titre VARCHAR(255) DEFAULT NULL, text LONGTEXT DEFAULT NULL, is_active TINYINT(1) DEFAULT 1 NOT NULL, lien_page VARCHAR(255) DEFAULT NULL, INDEX IDX_B96EBC192AADBACD (langue_id), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
@@ -125,6 +126,7 @@ final class Version20250820144901 extends AbstractMigration
         $this->addSql('DROP TABLE niveau');
         $this->addSql('DROP TABLE parent_eleve_relation');
         $this->addSql('DROP TABLE parent_profile');
+        $this->addSql('DROP TABLE refresh_tokens');
         $this->addSql('DROP TABLE site');
         $this->addSql('DROP TABLE site_about_ticket');
         $this->addSql('DROP TABLE site_about_us');
