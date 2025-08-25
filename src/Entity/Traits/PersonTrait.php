@@ -8,42 +8,57 @@ use Symfony\Component\Serializer\Attribute\Groups;
 trait PersonTrait
 {
     #[ORM\Column(length: 100)]
-    #[Groups(['admin:read', 'admin:write','admin:patch'])]
-    private ?string $nom = null;
+    #[Groups(['admin:read', 'admin:write','admin:patch','parent:read','parent:write','eleve:read','enseignant:read','enseignant:write','enseignant:patch'])]
+    private ?string $nom_fr = null;
 
     #[ORM\Column(length: 100)]
-    #[Groups(['admin:read', 'admin:write','admin:patch'])]
-    private ?string $prenom = null;
+    #[Groups(['admin:read', 'admin:write','admin:patch','parent:read','parent:write','eleve:read','enseignant:read','enseignant:write','enseignant:patch'])]
+    private ?string $nom_ar = null;
+
+    #[ORM\Column(length: 100)]
+    #[Groups(['admin:read', 'admin:write','admin:patch','parent:read','parent:write','eleve:read','enseignant:read','enseignant:write','enseignant:patch'])]
+    private ?string $prenom_fr = null;
+
+    #[ORM\Column(length: 100)]
+    #[Groups(['admin:read', 'admin:write','admin:patch','parent:read','parent:write','eleve:read','enseignant:read','enseignant:write','enseignant:patch'])]
+    private ?string $prenom_ar = null;
 
     #[ORM\Column(nullable: true)]
-    #[Groups(['admin:read', 'admin:write','admin:patch'])]
+    #[Groups(['admin:read', 'admin:write','admin:patch','parent:read','parent:write','enseignant:read','enseignant:write','enseignant:patch'])]
     private ?\DateTimeImmutable $dateNai = null;
 
     #[ORM\Column(nullable: true)]
-    #[Groups(['admin:read', 'admin:write','admin:patch'])]
+    #[Groups(['admin:read', 'admin:write','admin:patch','enseignant:read','enseignant:write','enseignant:patch'])]
     private ?\DateTimeImmutable $startAt = null;
 
     #[ORM\Column(length: 15, nullable: true)]
-    #[Groups(['admin:read', 'admin:write','admin:patch'])]
+    #[Groups(['admin:read', 'admin:write','admin:patch','parent:read','parent:write','enseignant:read','enseignant:write','enseignant:patch'])]
     private ?string $cin = null;
 
     #[ORM\Column(length: 15, nullable: true)]
-    #[Groups(['admin:read', 'admin:write','admin:patch'])]
+    #[Groups(['admin:read', 'admin:write','admin:patch','parent:read','parent:write','eleve:read','enseignant:read','enseignant:write','enseignant:patch'])]
     private ?string $phone = null;
 
     #[ORM\Column(length: 15, nullable: true)]
-    #[Groups(['admin:read', 'admin:write','admin:patch'])]
+    #[Groups(['admin:read', 'admin:write','admin:patch','parent:read','parent:write','eleve:read','enseignant:read','enseignant:write','enseignant:patch'])]
     private ?string $mobile = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(['admin:read', 'admin:write','admin:patch'])]
+    #[Groups(['admin:read', 'admin:write','admin:patch','parent:read','parent:write','enseignant:read','enseignant:write','enseignant:patch'])]
     private ?string $adresse = null;
 
-    public function getNom(): ?string { return $this->nom; }
-    public function setNom(string $nom): static { $this->nom = $nom; return $this; }
+    // --- Getters & Setters ---
+    public function getNomFr(): ?string { return $this->nom_fr; }
+    public function setNomFr(string $nom_fr): static { $this->nom_fr = $nom_fr; return $this; }
 
-    public function getPrenom(): ?string { return $this->prenom; }
-    public function setPrenom(string $prenom): static { $this->prenom = $prenom; return $this; }
+    public function getNomAr(): ?string { return $this->nom_ar; }
+    public function setNomAr(string $nom_ar): static { $this->nom_ar = $nom_ar; return $this; }
+
+    public function getPrenomFr(): ?string { return $this->prenom_fr; }
+    public function setPrenomFr(string $prenom_fr): static { $this->prenom_fr = $prenom_fr; return $this; }
+
+    public function getPrenomAr(): ?string { return $this->prenom_ar; }
+    public function setPrenomAr(string $prenom_ar): static { $this->prenom_ar = $prenom_ar; return $this; }
 
     public function getDateNai(): ?\DateTimeImmutable { return $this->dateNai; }
     public function setDateNai(?\DateTimeImmutable $dateNai): static { $this->dateNai = $dateNai; return $this; }

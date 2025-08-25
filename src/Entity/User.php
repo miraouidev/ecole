@@ -29,17 +29,6 @@ use Symfony\Component\Serializer\Annotation\Groups;
 )]
 #[ORM\UniqueConstraint(name: 'UNIQ_IDENTIFIER_USERNAME', fields: ['username'])]
 #[ORM\UniqueConstraint(name: 'UNIQ_IDENTIFIER_EMAIL', fields: ['email'])]
-/*#[ApiResource( // 👤 self service
-    routePrefix: '/users',
-    normalizationContext: ['groups' => ['user:read']],
-    denormalizationContext: ['groups' => ['user:write']],
-    operations: [
-        new Patch(
-            denormalizationContext: ['groups' => ['user:patch']],
-            security: "is_granted('ROLE_USER') and object == user"
-        )
-    ]
-)]*/
 #[ApiResource( // 🛠️ admin management
     routePrefix: '/admin',
     normalizationContext: ['groups' => ['user:read']],
@@ -69,11 +58,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?int $id = null;
 
     #[ORM\Column(length: 180)]
-    #[Groups(['user:read', 'user:write', 'admin:read',])]
+    #[Groups(['user:read', 'user:write', 'admin:read','parent:read'])]
     private ?string $username = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(['user:read', 'user:write', 'admin:read','user:patch'])]
+    #[Groups(['user:read', 'user:write', 'admin:read','user:patch','parent:read','parent:patch'])]
     private ?string $email = null;
 
     #[ORM\Column(length: 20)]

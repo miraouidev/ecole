@@ -1,52 +1,52 @@
 <?php
-
 namespace App\Entity;
 
+use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
+use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiResource;
 use App\Repository\NiveauRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: NiveauRepository::class)]
-#[ApiResource]
+#[ApiResource(
+    routePrefix: '/scolaire',
+    normalizationContext: ['groups' => ['niveau:read']],
+    //denormalizationContext: ['groups' => ['niveau:write']]
+)]
+#[ApiFilter(SearchFilter::class, properties: [
+    'code' => 'exact',
+    'nom_fr' => 'partial',
+    'nom_ar' => 'partial'
+])]
 class Niveau
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['niveau:read', 'matiere:read'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 100)]
-    private ?string $nom = null;
+    #[Groups(['niveau:read','niveau:write','matiere:read'])]
+    private ?string $nom_fr = null;
 
-    #[ORM\Column]
-    private ?bool $isActive = null;
+    #[ORM\Column(length: 100)]
+    #[Groups(['niveau:read','niveau:write','matiere:read'])]
+    private ?string $nom_ar = null;
 
-    public function getId(): ?int
-    {
-        return $this->id;
-    }
+    #[ORM\Column(length: 10, unique: true)]
+    #[Groups(['niveau:read','niveau:write','matiere:read'])]
+    private ?string $code = null;
 
-    public function getNom(): ?string
-    {
-        return $this->nom;
-    }
+    public function getId(): ?int { return $this->id; }
 
-    public function setNom(string $nom): static
-    {
-        $this->nom = $nom;
+    public function getNomFr(): ?string { return $this->nom_fr; }
+    public function setNomFr(string $nom_fr): static { $this->nom_fr = $nom_fr; return $this; }
 
-        return $this;
-    }
+    public function getNomAr(): ?string { return $this->nom_ar; }
+    public function setNomAr(string $nom_ar): static { $this->nom_ar = $nom_ar; return $this; }
 
-    public function isActive(): ?bool
-    {
-        return $this->isActive;
-    }
-
-    public function setIsActive(bool $isActive): static
-    {
-        $this->isActive = $isActive;
-
-        return $this;
-    }
+    public function getCode(): ?string { return $this->code; }
+    public function setCode(string $code): static { $this->code = strtoupper($code); return $this; }
 }
