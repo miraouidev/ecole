@@ -14,6 +14,7 @@ use App\Repository\RoleAppRepository;
 
 #[ORM\Entity(repositoryClass: RoleAppRepository::class)]
 #[ApiResource(
+    routePrefix: '/admin',
     normalizationContext: ['groups' => ['role:read']],
     denormalizationContext: ['groups' => ['role:write']],
     paginationItemsPerPage: 10,
