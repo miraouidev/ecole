@@ -17,6 +17,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
 #[ORM\Entity(repositoryClass: AnneeScolaireCouranteRepository::class)]
 #[ApiResource(
     routePrefix: '/admin',
+    order: ['id' => 'DESC'],
     normalizationContext: ['groups' => ['annee:read']],
     denormalizationContext: ['groups' => ['annee:write']],
     operations: [

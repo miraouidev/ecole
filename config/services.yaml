@@ -17,6 +17,10 @@ services:
     App\:
         resource: '../src/'
     
+    App\Controller\:
+        resource: '../src/Controller'
+        tags: ['controller.service_arguments']
+        
     App\EventListener\JWTCreatedListener:
         tags:
             - { name: kernel.event_listener, event: lexik_jwt_authentication.on_jwt_created, method: onJWTCreated }
@@ -26,5 +30,9 @@ services:
     App\State\UserPasswordProcessor:
         arguments:
             $persistProcessor: '@api_platform.doctrine.orm.state.persist_processor'
+    App\EventListener\RefreshTokenListener:
+        tags:
+            - { name: kernel.event_listener, event: gesdinet.jwt_refresh, method: onJwtRefresh }
+
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones

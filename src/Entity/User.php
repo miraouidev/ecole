@@ -58,11 +58,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?int $id = null;
 
     #[ORM\Column(length: 180)]
-    #[Groups(['user:read', 'user:write', 'admin:read','parent:read'])]
+    #[Groups(['user:read', 'user:write', 'admin:read','parent:read','historique:read'])]
     private ?string $username = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(['user:read', 'user:write', 'admin:read','user:patch','parent:read','parent:patch'])]
+    #[Groups(['user:read', 'user:write', 'admin:read','user:patch','parent:read','parent:patch','historique:read'])]
     private ?string $email = null;
 
     #[ORM\Column(length: 20)]

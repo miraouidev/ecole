@@ -10,7 +10,7 @@ use Doctrine\Migrations\AbstractMigration;
 /**
  * Auto-generated Migration: Please modify to your needs!
  */
-final class Version20250825145933 extends AbstractMigration
+final class Version20250829161657 extends AbstractMigration
 {
     public function getDescription(): string
     {
@@ -27,6 +27,7 @@ final class Version20250825145933 extends AbstractMigration
         $this->addSql('CREATE TABLE enseignant (id INT AUTO_INCREMENT NOT NULL, civilite_id INT DEFAULT NULL, nom_fr VARCHAR(100) NOT NULL, nom_ar VARCHAR(100) NOT NULL, prenom_fr VARCHAR(100) NOT NULL, prenom_ar VARCHAR(100) NOT NULL, date_nai DATETIME DEFAULT NULL COMMENT \'(DC2Type:datetime_immutable)\', start_at DATETIME DEFAULT NULL COMMENT \'(DC2Type:datetime_immutable)\', cin VARCHAR(15) DEFAULT NULL, phone VARCHAR(15) DEFAULT NULL, mobile VARCHAR(15) DEFAULT NULL, adresse VARCHAR(255) DEFAULT NULL, is_active TINYINT(1) DEFAULT 1 NOT NULL, INDEX IDX_81A72FA139194ABF (civilite_id), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
         $this->addSql('CREATE TABLE fonction (id INT AUTO_INCREMENT NOT NULL, nom_fr VARCHAR(100) NOT NULL, nom_ar VARCHAR(100) NOT NULL, code VARCHAR(10) NOT NULL, PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
         $this->addSql('CREATE TABLE groupe (id INT AUTO_INCREMENT NOT NULL, niveau_id INT NOT NULL, annee_scolaire_id INT NOT NULL, nom_fr VARCHAR(100) NOT NULL, nom_ar VARCHAR(100) NOT NULL, INDEX IDX_4B98C21B3E9C81 (niveau_id), INDEX IDX_4B98C219331C741 (annee_scolaire_id), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
+        $this->addSql('CREATE TABLE historique_auth (id INT AUTO_INCREMENT NOT NULL, user_id INT DEFAULT NULL, auth_at DATETIME NOT NULL COMMENT \'(DC2Type:datetime_immutable)\', auth_ok TINYINT(1) NOT NULL, ip VARCHAR(30) DEFAULT NULL, name_user VARCHAR(255) DEFAULT NULL, is_connect TINYINT(1) NOT NULL, INDEX IDX_7C8797BBA76ED395 (user_id), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
         $this->addSql('CREATE TABLE langue (id INT AUTO_INCREMENT NOT NULL, code VARCHAR(5) NOT NULL, name VARCHAR(100) NOT NULL, PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
         $this->addSql('CREATE TABLE log_api (id INT AUTO_INCREMENT NOT NULL, user_id INT DEFAULT NULL, date_at DATETIME NOT NULL COMMENT \'(DC2Type:datetime_immutable)\', method VARCHAR(10) DEFAULT NULL, contenu JSON DEFAULT NULL, ip VARCHAR(30) DEFAULT NULL, utilisateur VARCHAR(150) DEFAULT NULL, device VARCHAR(255) DEFAULT NULL, INDEX IDX_C2E0F1D4A76ED395 (user_id), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
         $this->addSql('CREATE TABLE matiere_classe_prof (id INT AUTO_INCREMENT NOT NULL, groupe_id INT NOT NULL, matiere_id INT NOT NULL, enseignant_id INT DEFAULT NULL, principal TINYINT(1) DEFAULT 1 NOT NULL, INDEX IDX_741543397A45358C (groupe_id), INDEX IDX_74154339F46CD258 (matiere_id), INDEX IDX_74154339E455FCC0 (enseignant_id), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
@@ -60,6 +61,7 @@ final class Version20250825145933 extends AbstractMigration
         $this->addSql('ALTER TABLE enseignant ADD CONSTRAINT FK_81A72FA139194ABF FOREIGN KEY (civilite_id) REFERENCES civilite (id)');
         $this->addSql('ALTER TABLE groupe ADD CONSTRAINT FK_4B98C21B3E9C81 FOREIGN KEY (niveau_id) REFERENCES niveau (id)');
         $this->addSql('ALTER TABLE groupe ADD CONSTRAINT FK_4B98C219331C741 FOREIGN KEY (annee_scolaire_id) REFERENCES annee_scolaire_courante (id)');
+        $this->addSql('ALTER TABLE historique_auth ADD CONSTRAINT FK_7C8797BBA76ED395 FOREIGN KEY (user_id) REFERENCES user (id)');
         $this->addSql('ALTER TABLE log_api ADD CONSTRAINT FK_C2E0F1D4A76ED395 FOREIGN KEY (user_id) REFERENCES user (id)');
         $this->addSql('ALTER TABLE matiere_classe_prof ADD CONSTRAINT FK_741543397A45358C FOREIGN KEY (groupe_id) REFERENCES groupe (id)');
         $this->addSql('ALTER TABLE matiere_classe_prof ADD CONSTRAINT FK_74154339F46CD258 FOREIGN KEY (matiere_id) REFERENCES matieres (id)');
@@ -95,6 +97,7 @@ final class Version20250825145933 extends AbstractMigration
         $this->addSql('ALTER TABLE enseignant DROP FOREIGN KEY FK_81A72FA139194ABF');
         $this->addSql('ALTER TABLE groupe DROP FOREIGN KEY FK_4B98C21B3E9C81');
         $this->addSql('ALTER TABLE groupe DROP FOREIGN KEY FK_4B98C219331C741');
+        $this->addSql('ALTER TABLE historique_auth DROP FOREIGN KEY FK_7C8797BBA76ED395');
         $this->addSql('ALTER TABLE log_api DROP FOREIGN KEY FK_C2E0F1D4A76ED395');
         $this->addSql('ALTER TABLE matiere_classe_prof DROP FOREIGN KEY FK_741543397A45358C');
         $this->addSql('ALTER TABLE matiere_classe_prof DROP FOREIGN KEY FK_74154339F46CD258');
@@ -127,6 +130,7 @@ final class Version20250825145933 extends AbstractMigration
         $this->addSql('DROP TABLE enseignant');
         $this->addSql('DROP TABLE fonction');
         $this->addSql('DROP TABLE groupe');
+        $this->addSql('DROP TABLE historique_auth');
         $this->addSql('DROP TABLE langue');
         $this->addSql('DROP TABLE log_api');
         $this->addSql('DROP TABLE matiere_classe_prof');

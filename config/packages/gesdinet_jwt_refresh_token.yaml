@@ -1,6 +1,7 @@
 gesdinet_jwt_refresh_token:
   refresh_token_class: App\Entity\RefreshToken
-  ttl: 604800            # 7 days (in seconds)
+  ttl: 43200            # 12 houre
   firewall: main
   token_parameter_name: refresh_token
-  single_use: true       # each refresh token can only be used once (recommended)
+  user_identity_field: username
+  single_use: true      # ✅ chaque refresh génère un nouveau refresh_token

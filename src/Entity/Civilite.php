@@ -29,7 +29,7 @@ class Civilite
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['civilite:read', 'parent:read','enseignant:read','enseignant:write'])]
+    #[Groups(['civilite:read', 'parent:read','enseignant:read','enseignant:write','admin:read'])]
     private ?int $id = null;
 
     use CodeNomTrait;

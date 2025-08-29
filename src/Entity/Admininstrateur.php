@@ -13,6 +13,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
 #[ORM\Entity(repositoryClass: AdmininstrateurRepository::class)]
 #[ApiResource(
     routePrefix: '/admin',
+    order: ['nom_fr' => 'asc'],
     normalizationContext: ['groups' => ['admin:read']],
     denormalizationContext: ['groups' => ['admin:write']],
      operations: [
