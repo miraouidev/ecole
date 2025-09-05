@@ -15,7 +15,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
 #[ApiResource(
     order: ['id' => 'DESC'],
     routePrefix: '/admin',
-    normalizationContext: ['groups' => ['historique:read']],
+    normalizationContext: ['groups' => ['historique:read'],'skip_null_values' => false],
     operations: [
         new \ApiPlatform\Metadata\GetCollection(), // liste avec filtres
         new \ApiPlatform\Metadata\Get(),           // détail
@@ -67,6 +67,10 @@ class HistoriqueAuth
     #[Groups(['historique:read', 'historique:write'])]
     private ?bool $isConnect = null;
 
+    #[ORM\Column(options: ['default' => true])]
+    #[Groups(['historique:read', 'historique:write'])]
+    private ?bool $isRefresh = null;
+
     public function getId(): ?int { return $this->id; }
 
     public function getAuthAt(): ?\DateTimeImmutable { return $this->authAt; }
@@ -100,8 +104,25 @@ class HistoriqueAuth
     }
 
     public function isConnect(): ?bool { return $this->isConnect; }
+    public function getIsConnect(): ?bool { return $this->isConnect; }
     public function setIsConnect(bool $isConnect): static {
         $this->isConnect = $isConnect;
+        return $this;
+    }
+
+    public function isRefresh(): ?bool
+    {
+        return $this->isRefresh;
+    }
+
+    public function getIsRefresh(): ?bool
+    {
+        return $this->isRefresh;
+    }
+    public function setIsRefresh(bool $isRefresh): static
+    {
+        $this->isRefresh = $isRefresh;
+
         return $this;
     }
 }

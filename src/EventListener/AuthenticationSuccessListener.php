@@ -72,6 +72,7 @@ class AuthenticationSuccessListener
         $historique->setAuthAt(new \DateTimeImmutable());
         $historique->setAuthOk(true); // auth réussie
         $historique->setIsConnect(true);
+        $historique->setIsRefresh(false);
         $historique->setIp($request?->getClientIp());
         // 🔎 Déterminer le "nameUser"
         if ($user->getAdmininstrateur() !== null) {

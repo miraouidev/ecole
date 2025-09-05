@@ -7,6 +7,7 @@ use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiResource;
 use App\Entity\Traits\PersonTrait;
 use App\Repository\AdmininstrateurRepository;
+use App\State\AdminProcessor;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 
@@ -18,6 +19,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
     denormalizationContext: ['groups' => ['admin:write']],
      operations: [
         new \ApiPlatform\Metadata\Post(
+            processor: AdminProcessor::class,
             denormalizationContext: ['groups' => ['admin:write']], // ✅ user modifiable
         ),
         new \ApiPlatform\Metadata\Patch(
@@ -45,7 +47,7 @@ class Admininstrateur
     private ?int $id = null;
 
     #[ORM\OneToOne(mappedBy: 'admininstrateur', cascade: ['persist', 'remove'])]
-    #[Groups(['admin:read', 'admin:write'])]
+    #[Groups(['admin:read'])]
     private ?User $user = null;
 
     #[ORM\ManyToOne]
@@ -72,6 +74,17 @@ class Admininstrateur
     public function getCivilite(): ?Civilite { return $this->civilite; }
     public function setCivilite(?Civilite $civilite): static {
         $this->civilite = $civilite;
+        return $this;
+    }
+
+    #[Groups(['admin:patch'])]
+    public function setIsActive(?bool $active): self
+    {
+        if (!$this->user) {
+            // Return 422 instead if you prefer strict API behaviour
+            throw new \LogicException("Aucun utilisateur lié à cet administrateur.");
+        }
+        $this->user->setIsActive((bool) $active);
         return $this;
     }
 }

@@ -24,7 +24,8 @@ trait IsActiveTrait
         'sitepage:read','sitepage:write',
         'user:read', 'user:write','user:patch',
         'annee:read','annee:write','annee:patch','parent:patch',
-        'enseignant:read','enseignant:write','enseignant:patch'
+        'enseignant:read','enseignant:write','enseignant:patch',
+        'admin:read'
     ])]
     private ?bool $isActive = true;
 
