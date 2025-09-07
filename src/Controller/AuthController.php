@@ -14,7 +14,7 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class AuthController extends AbstractController
 {
-    #[Route('/auth/token/refresh', name: 'api_token_refresh', methods: ['POST'])]
+    #[Route('/auth/token/refresh-jwt', name: 'api_token_refresh', methods: ['POST'])]
     public function refreshToken(
         Request $request,
         EntityManagerInterface $em,

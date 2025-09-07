@@ -44,7 +44,6 @@ class EleveProcessor implements ProcessorInterface
 
                     $this->em->persist($relation);
                 }else{
-                    dd('sss');
                     throw new \Exception("Parent not found for the given ID.");
                 }
             }
