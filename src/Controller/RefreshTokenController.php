@@ -14,7 +14,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
 
 class RefreshTokenController
 {
-    #[Route('/auth/token/refresh-jwt', name: 'app_token_refresh', methods: ['POST'])]
+    #[Route('/auth/token/auto-refresh', name: 'app_token_refresh_auto', methods: ['POST'])]
     public function refresh(
         Request $request,
         JWTTokenManagerInterface $jwtManager,
