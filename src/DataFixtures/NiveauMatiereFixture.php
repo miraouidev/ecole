@@ -272,6 +272,7 @@ class NiveauMatiereFixture extends Fixture
             $niveau->setNomFr($data['fr']);
             $niveau->setNomAr($data['ar']);
             $niveau->setCode($code);
+            $niveau->setIsActive(true);
             $manager->persist($niveau);
 
             foreach ($data['matieres'] as $matiereData) {

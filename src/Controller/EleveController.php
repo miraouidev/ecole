@@ -29,7 +29,7 @@ class EleveController extends AbstractController
         $cacheKey = "eleves_groupe_$id";
 
         $data = $this->cache->get($cacheKey, function (ItemInterface $item) use ($id) {
-            $item->expiresAfter(360000); // ⏳ 1h de cache
+            $item->expiresAfter(360000); //  1h de cache
 
             $groupe = $this->em->getRepository(Groupe::class)->find($id);
             if (!$groupe) {
@@ -207,4 +207,26 @@ class EleveController extends AbstractController
 
         return $this->json(['success' => 'Relation supprimée avec succès']);
     }
+
+
+    #[Route('/cache/clear', name: 'eleve_clear_cache', methods: ['GET'])]
+    public function setNewData(): JsonResponse
+    {
+        // Get all groups
+        $groupes = $this->em->getRepository(Groupe::class)->findAll();
+
+        $deleted = 0;
+        foreach ($groupes as $groupe) {
+            $cacheKey = "eleves_groupe_" . $groupe->getId();
+            if ($this->cache->delete($cacheKey)) {
+                $deleted++;
+            }
+        }
+
+        return new JsonResponse([
+            'status' => 'success',
+            'message' => "Cache cleared for {$deleted} groupes"
+        ]);
+    }
+
 }

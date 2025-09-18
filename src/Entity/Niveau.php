@@ -1,9 +1,11 @@
 <?php
 namespace App\Entity;
 
+use ApiPlatform\Doctrine\Orm\Filter\BooleanFilter;
 use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
 use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiResource;
+use App\Entity\Traits\IsActiveTrait;
 use App\Repository\NiveauRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
@@ -12,13 +14,14 @@ use Symfony\Component\Serializer\Annotation\Groups;
 #[ApiResource(
     routePrefix: '/scolaire',
     normalizationContext: ['groups' => ['niveau:read']],
-    //denormalizationContext: ['groups' => ['niveau:write']]
+    denormalizationContext: ['groups' => ['niveau:write']]
 )]
 #[ApiFilter(SearchFilter::class, properties: [
     'code' => 'exact',
     'nom_fr' => 'partial',
-    'nom_ar' => 'partial'
+    'nom_ar' => 'partial',
 ])]
+#[ApiFilter(BooleanFilter::class, properties: ['isActive'])]
 class Niveau
 {
     #[ORM\Id]
@@ -38,6 +41,8 @@ class Niveau
     #[ORM\Column(length: 10, unique: true)]
     #[Groups(['niveau:read','niveau:write','matiere:read'])]
     private ?string $code = null;
+
+    use IsActiveTrait;
 
     public function getId(): ?int { return $this->id; }
 
