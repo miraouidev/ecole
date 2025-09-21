@@ -56,6 +56,7 @@ class Matieres
     public function getNomAr(): ?string { return $this->nom_ar; }
     public function setNomAr(string $nom_ar): static { $this->nom_ar = $nom_ar; return $this; }
     public function isActive(): ?bool { return $this->isActive; }
+    public function getIsActive(): ?bool { return $this->isActive; }
     public function setIsActive(bool $isActive): static { $this->isActive = $isActive; return $this; }
     public function getNiveau(): ?Niveau { return $this->niveau; }
     public function setNiveau(?Niveau $niveau): static { $this->niveau = $niveau; return $this; }
