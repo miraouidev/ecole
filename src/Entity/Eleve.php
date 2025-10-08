@@ -35,7 +35,8 @@ use Symfony\Component\Serializer\Annotation\Groups;
     'nom_ar'     => 'partial',
     'prenom_fr'  => 'partial',
     'prenom_ar'  => 'partial',
-    'groupe.id'  => 'exact'
+    'groupe.id'  => 'exact',
+    'parentEleveRelations.parent.id' => 'exact'
 ])]
 class Eleve
 {

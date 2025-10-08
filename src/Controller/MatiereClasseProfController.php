@@ -37,32 +37,69 @@ class MatiereClasseProfController extends AbstractController
         $groupeIris   = $data['groupes'] ?? [];
         $principal    = $data['principal'] ?? false;
 
-        if ( !$matiereId || empty($groupeIris)) {
+        if (!$matiereId || empty($groupeIris)) {
             return $this->json(['error' => 'matière et groupes requis'], 400);
         }
 
-        $enseignant = $this->em->getRepository(Enseignant::class)->find($enseignantId??0);
+        $enseignant = $this->em->getRepository(Enseignant::class)->find($enseignantId ?? 0);
         $matiere    = $this->em->getRepository(Matieres::class)->find($matiereId);
 
         if (!$matiere) {
             return $this->json(['error' => 'Matière introuvable'], 404);
         }
 
+        $niveau = $matiere->getNiveau();
+        $errors = [];
         $created = [];
+
         foreach ($groupeIris as $groupeIri) {
             $groupeId = $this->getIdFromIri($groupeIri);
-            if (!$groupeId) continue;
+            if (!$groupeId) {
+                $errors[] = ['groupe' => $groupeIri, 'error' => 'Groupe introuvable (IRI invalide)'];
+                continue;
+            }
 
             $groupe = $this->em->getRepository(Groupe::class)->find($groupeId);
-            if (!$groupe) continue;
+            if (!$groupe) {
+                $errors[] = ['groupe' => $groupeIri, 'error' => 'Groupe introuvable'];
+                continue;
+            }
+
+            $niveauGroup = $groupe->getNiveau();
+            if ($niveau && $niveauGroup && $niveau->getId() !== $niveauGroup->getId()) {
+                $errors[] = [
+                    'groupe' => $groupeIri,
+                    'error'  => 'Niveau du groupe ne correspond pas à celui de la matière',
+                ];
+                continue;
+            }
+
+            //// Vérifier si l’association existe déjà
+            $existing = $this->em->getRepository(MatiereClasseProf::class)->
+                findOneBy(['enseignant' => $enseignant, 'matiere' => $matiere, 'groupe' => $groupe]);
+            if ($existing) {
+                $errors[] = [
+                    'groupe'     => $groupeIri,
+                    'error'      => sprintf(
+                        "Association déjà existante : %s - %s - %s",
+                        $enseignant?->getNomFr() ?? 'Enseignant inconnu',
+                        $matiere?->getNomFr()?? 'Matière inconnue',
+                        $groupe?->getNomFr() ?? 'Groupe inconnu'
+                    ),
+                ];
+                continue;
+            }
+
+             //// Créer l’association
 
             $mcp = new MatiereClasseProf();
             $mcp->setEnseignant($enseignant);
             $mcp->setMatiere($matiere);
             $mcp->setGroupe($groupe);
             $mcp->setPrincipal((bool)$principal);
+
             if ($principal && $enseignant) {
-                // Désactiver les anciens "principal"
+                // désactiver anciens "principal"
                 $this->em->createQueryBuilder()
                     ->update(MatiereClasseProf::class, 'm')
                     ->set('m.principal', ':false')
@@ -74,8 +111,16 @@ class MatiereClasseProfController extends AbstractController
                     ->getQuery()
                     ->execute();
             }
+
             $this->em->persist($mcp);
             $created[] = $mcp;
+        }
+
+        if (!empty($errors)) {
+            return $this->json([
+                'message' => 'Certaines associations n’ont pas pu être créées',
+                'errors'  => $errors,
+            ], 400);
         }
 
         $this->em->flush();
@@ -126,62 +171,113 @@ class MatiereClasseProfController extends AbstractController
         return $this->json(['message' => 'MatiereClasseProf mis à jour']);
     }
 
-
-        /**
-     * 🔄 Remplacer un enseignant (oldProf) par un autre (newProf) pour une matière dans des groupes
+    /**
+     * 🔄 Remplacer un enseignant (oldProf) par un autre (newProf)
      */
     #[Route('/replace-prof', name: 'matiere_classe_prof_replace_prof', methods: ['PATCH'])]
     public function replaceProf(Request $request): JsonResponse
     {
         $data = json_decode($request->getContent(), true);
 
-        $oldProfId = $this->getIdFromIri($data['oldProf'] ?? '');
-        $newProfId = $this->getIdFromIri($data['newProf'] ?? '');
-        $matiereId = $this->getIdFromIri($data['matiere'] ?? '');
+        $oldProfId  = $this->getIdFromIri($data['oldProf'] ?? '');
+        $newProfId  = $this->getIdFromIri($data['newProf'] ?? '');
+        $matiereId  = $this->getIdFromIri($data['matiere'] ?? '');
         $groupeIris = $data['groupes'] ?? [];
+        $all        = (bool)($data['all'] ?? false);
 
-        if (!$oldProfId || !$newProfId || !$matiereId || empty($groupeIris)) {
-            return $this->json(['error' => 'oldProf, newProf, matière et groupes requis'], 400);
+        if (!$oldProfId || !$newProfId) {
+            return $this->json(['error' => 'oldProf et newProf requis'], 400);
         }
 
         $oldProf = $this->em->getRepository(Enseignant::class)->find($oldProfId);
         $newProf = $this->em->getRepository(Enseignant::class)->find($newProfId);
-        $matiere = $this->em->getRepository(Matieres::class)->find($matiereId);
+        $errors  = [];
 
-        if (!$oldProf || !$newProf || !$matiere) {
-            return $this->json(['error' => 'Professeur ou matière introuvable'], 404);
+        if (!$oldProf) {
+            $errors[] = ['entity' => 'oldProf', 'id' => $oldProfId, 'error' => 'Professeur introuvable'];
+        }
+        if (!$newProf) {
+            $errors[] = ['entity' => 'newProf', 'id' => $newProfId, 'error' => 'Professeur introuvable'];
+        }
+        if (!empty($errors)) {
+            return $this->json(['errors' => $errors], 400);
         }
 
         $updated = 0;
-        foreach ($groupeIris as $groupeIri) {
-            $groupeId = $this->getIdFromIri($groupeIri);
-            if (!$groupeId) continue;
 
-            $groupe = $this->em->getRepository(Groupe::class)->find($groupeId);
-            if (!$groupe) continue;
+        if ($all) {
+            $mcps = $this->em->getRepository(MatiereClasseProf::class)
+                ->findBy(['enseignant' => $oldProf]);
 
-            // Chercher l’association existante avec l’ancien prof
-            $mcp = $this->em->getRepository(MatiereClasseProf::class)->findOneBy([
-                'enseignant' => $oldProf,
-                'matiere'    => $matiere,
-                'groupe'     => $groupe,
-            ]);
+            if (empty($mcps)) {
+                $errors[] = ['entity' => 'MatiereClasseProf', 'id' => $oldProfId, 'error' => 'Aucune association trouvée'];
+            }
 
-            if ($mcp) {
+            foreach ($mcps as $mcp) {
                 $mcp->setEnseignant($newProf);
                 $updated++;
             }
+        } else {
+            if (!$matiereId || empty($groupeIris)) {
+                return $this->json(['error' => 'matière et groupes requis si all=false'], 400);
+            }
+
+            $matiere = $this->em->getRepository(Matieres::class)->find($matiereId);
+            if (!$matiere) {
+                $errors[] = ['entity' => 'matiere', 'id' => $matiereId, 'error' => 'Matière introuvable'];
+            }
+
+            foreach ($groupeIris as $groupeIri) {
+                $groupeId = $this->getIdFromIri($groupeIri);
+                if (!$groupeId) {
+                    $errors[] = ['entity' => 'groupe', 'iri' => $groupeIri, 'error' => 'IRI invalide'];
+                    continue;
+                }
+
+                $groupe = $this->em->getRepository(Groupe::class)->find($groupeId);
+                if (!$groupe) {
+                    $errors[] = ['entity' => 'groupe', 'id' => $groupeId, 'error' => 'Groupe introuvable'];
+                    continue;
+                }
+
+                $mcp = $this->em->getRepository(MatiereClasseProf::class)->findOneBy([
+                    'enseignant' => $oldProf,
+                    'matiere'    => $matiere,
+                    'groupe'     => $groupe,
+                ]);
+
+                if ($mcp) {
+                    $mcp->setEnseignant($newProf);
+                    $updated++;
+                } else {
+                    $errors[] = [
+                        'entity' => 'MatiereClasseProf',
+                        'matiere' => $matiereId,
+                        'groupe' => $groupeId,
+                        'error'  => 'Association non trouvée',
+                    ];
+                }
+            }
+        }
+
+        if (!empty($errors)) {
+            return $this->json([
+                'message' => 'Des erreurs sont survenues',
+                'updated' => $updated,
+                'errors'  => $errors,
+            ], 400);
         }
 
         $this->em->flush();
 
         return $this->json([
-            'message' => "Remplacement effectué avec succès",
-            'count'   => $updated
+            'message' => 'Remplacement effectué avec succès',
+            'count'   => $updated,
         ]);
     }
 
-        /**
+
+    /**
      * 🌟 Définir un prof comme principal (ou non)
      */
     #[Route('/set-principal', name: 'matiere_classe_prof_set_principal', methods: ['PATCH'])]
@@ -235,6 +331,76 @@ class MatiereClasseProfController extends AbstractController
 
         return $this->json([
             'message' => $principal ? 'Prof défini comme principal' : 'Prof retiré de principal',
+        ]);
+    }
+
+
+#[Route('set-prof',name: 'matiere_classe_prof_set_principal',methods: ['PATCH'])]
+    public function setProf(Request $request): JsonResponse
+    {
+        $data = json_decode($request->getContent(), true);
+
+        $profId    = $this->getIdFromIri($data['prof'] ?? '');
+        $principal = (bool)($data['principal'] ?? false);
+        $mcpIris   = $data['matiereClasseProf'] ?? [];
+
+        $errors  = [];
+        $updated = [];
+
+        if (!$profId) {
+            return $this->json(['error' => 'prof requis'], 400);
+        }
+
+        $prof = $this->em->getRepository(Enseignant::class)->find($profId);
+        if (!$prof) {
+            return $this->json(['error' => 'Professeur introuvable'], 404);
+        }
+
+        foreach ($mcpIris as $mcpIri) {
+            $mcpId = $this->getIdFromIri($mcpIri);
+            if (!$mcpId) {
+                $errors[] = ['entity' => 'MatiereClasseProf', 'iri' => $mcpIri, 'error' => 'IRI invalide'];
+                continue;
+            }
+
+            $mcp = $this->em->getRepository(MatiereClasseProf::class)->find($mcpId);
+            if (!$mcp) {
+                $errors[] = ['entity' => 'MatiereClasseProf', 'id' => $mcpId, 'error' => 'Introuvable'];
+                continue;
+            }
+
+            if ($mcp->getEnseignant() !== null) {
+                $errors[] = [
+                    'entity' => 'MatiereClasseProf',
+                    'id'     => $mcpId,
+                    'error'  => sprintf(
+                        "Déjà affecté à %s",
+                        $mcp->getEnseignant()->getNomFr() ?? 'Enseignant inconnu'
+                    ),
+                ];
+                continue;
+            }
+
+            // Assigner le prof car MCP est vide
+            $mcp->setEnseignant($prof);
+            $mcp->setPrincipal($principal);
+            $updated[] = $mcpId;
+        }
+
+        if (!empty($errors)) {
+            return $this->json([
+                'message' => 'Des erreurs sont survenues',
+                'updated' => $updated,
+                'errors'  => $errors,
+            ], 400);
+        }
+
+        $this->em->flush();
+
+        return $this->json([
+            'message' => 'Mise à jour effectuée',
+            'count'   => count($updated),
+            'updated' => $updated,
         ]);
     }
 

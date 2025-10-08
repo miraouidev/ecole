@@ -2,12 +2,29 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Doctrine\Orm\Filter\BooleanFilter;
+use ApiPlatform\Doctrine\Orm\Filter\ExistsFilter;
+use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
+use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\GetCollection;
 use App\Repository\MatiereClasseProfRepository;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: MatiereClasseProfRepository::class)]
-#[ApiResource]
+#[ApiResource(
+    operations: [ new GetCollection()]
+)]
+// filtres simples
+#[ApiFilter(SearchFilter::class, properties: [
+    'groupe' => 'exact',
+    'matiere' => 'exact',
+    'enseignant' => 'exact',  // filtre sur un enseignant précis
+])]
+// filtre booléen sur principal
+#[ApiFilter(BooleanFilter::class, properties: ['principal'])]
+// permet d’exprimer "enseignant IS NULL" ou "enseignant IS NOT NULL"
+#[ApiFilter(ExistsFilter::class, properties: ['enseignant'])]
 class MatiereClasseProf
 {
     #[ORM\Id]

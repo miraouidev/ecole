@@ -152,63 +152,7 @@ class EleveController extends AbstractController
 
         return $this->json(['success' => "Élève affecté au groupe ".$groupe->getNomFr()]);
     }
-
-    // 🔹 2. Ajouter une relation parent/élève
-    #[Route('/{id}/add-relation', name: 'eleve_add_relation', methods: ['POST'])]
-    public function addRelation(int $id, Request $request): JsonResponse
-    {
-        $eleve = $this->em->getRepository(Eleve::class)->find($id);
-        if (!$eleve) {
-            return $this->json(['error' => 'Élève introuvable'], 404);
-        }
-
-        $data = json_decode($request->getContent(), true);
-        if (!isset($data['parent'], $data['typeRelation'])) {
-            return $this->json(['error' => 'Champs requis: parent, typeRelation'], 400);
-        }
-
-        $parentId = $this->getIdFromIri($data['parent']);
-        $relationId = $this->getIdFromIri($data['typeRelation']);
-
-        $parent = $this->em->getRepository(ParentProfile::class)->find($parentId);
-        $typeRelation = $this->em->getRepository(TypeRelation::class)->find($relationId);
-
-        if (!$parent || !$typeRelation) {
-            return $this->json(['error' => 'Parent ou TypeRelation introuvable'], 404);
-        }
-
-        $relation = new ParentEleveRelation();
-        $relation->setEleve($eleve);
-        $relation->setParent($parent);
-        $relation->setTypeRelation($typeRelation);
-
-        $this->em->persist($relation);
-        $this->em->flush();
-
-        return $this->json(['success' => 'Relation ajoutée avec succès']);
-    }
-
-    // 🔹 3. Supprimer une relation
-    #[Route('/{id}/remove-relation/{relationId}', name: 'eleve_remove_relation', methods: ['DELETE'])]
-    public function removeRelation(int $id, int $relationId): JsonResponse
-    {
-        $eleve = $this->em->getRepository(Eleve::class)->find($id);
-        if (!$eleve) {
-            return $this->json(['error' => 'Élève introuvable'], 404);
-        }
-
-        $relation = $this->em->getRepository(ParentEleveRelation::class)->find($relationId);
-        if (!$relation || $relation->getEleve()->getId() !== $id) {
-            return $this->json(['error' => 'Relation introuvable pour cet élève'], 404);
-        }
-
-        $this->em->remove($relation);
-        $this->em->flush();
-
-        return $this->json(['success' => 'Relation supprimée avec succès']);
-    }
-
-
+    
     #[Route('/cache/clear', name: 'eleve_clear_cache', methods: ['GET'])]
     public function setNewData(): JsonResponse
     {
