@@ -8,15 +8,15 @@ use Symfony\Component\Serializer\Attribute\Groups;
 trait CodeNomTrait
 {
     #[ORM\Column(length: 100)]
-    #[Groups(['relation:read','civilite:read','civilite:write','parent:read','parent:write','eleve:read','enseignant:read','enseignant:write','admin:read'])]
+    #[Groups(['relation:read','civilite:read','civilite:write','parent:read','parent:write','eleve:read','enseignant:read','enseignant:write','admin:read','rh_employe:read'])]
     private ?string $nom_fr = null;
 
     #[ORM\Column(length: 100)]
-    #[Groups(['relation:read','civilite:read','civilite:write','parent:read','parent:write','eleve:read','enseignant:read','enseignant:write','admin:read'])]
+    #[Groups(['relation:read','civilite:read','civilite:write','parent:read','parent:write','eleve:read','enseignant:read','enseignant:write','admin:read','rh_employe:read'])]
     private ?string $nom_ar = null;
 
     #[ORM\Column(length: 10)]
-    #[Groups(['relation:read','civilite:read','civilite:write','parent:read','parent:write','eleve:read','enseignant:read','admin:read'])]
+    #[Groups(['relation:read','civilite:read','civilite:write','parent:read','parent:write','eleve:read','enseignant:read','admin:read','rh_employe:read'])]
     private ?string $code = null;
 
     public function getNomFr(): ?string { return $this->nom_fr; }

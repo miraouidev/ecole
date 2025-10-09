@@ -26,7 +26,8 @@ trait IsActiveTrait
         'annee:read','annee:write','annee:patch','parent:patch',
         'enseignant:read','enseignant:write','enseignant:patch',
         'admin:read',
-        'niveau:read','niveau:write'
+        'niveau:read','niveau:write',
+        'rh_employe:read', 'rh_employe:write'
     ])]
     private ?bool $isActive = true;
 
