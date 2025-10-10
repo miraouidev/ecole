@@ -10,6 +10,7 @@ use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Patch;
+use ApiPlatform\Metadata\Delete;
 use App\Repository\RhCongeRepository;
 use App\Validator\UniqueCongePeriode;
 use Doctrine\ORM\Mapping as ORM;
@@ -33,6 +34,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 )]
 #[ApiFilter(SearchFilter::class, properties: [
     'employee.nom_fr' => 'partial',
+    'employee.id' => 'exact',
     'employee.prenom_fr' => 'partial',
     'employee.nom_ar' => 'partial',
     'employee.prenom_ar' => 'partial',
