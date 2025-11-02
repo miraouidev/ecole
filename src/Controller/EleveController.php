@@ -23,12 +23,13 @@ class EleveController extends AbstractController
         private CacheInterface $cache
     ) {}
 
-    #[Route('/by-groupe/{id}', name: 'eleve_by_groupe', methods: ['GET'])]
-    public function listByGroupe(int $id): JsonResponse
+    #[Route('/by-groupe/{id}/mini/{miniNumber}', name: 'eleve_by_groupe', methods: ['GET'])]
+    public function listByGroupe(int $id,int $miniNumber): JsonResponse
     {
-        $cacheKey = "eleves_groupe_$id";
+        $cacheKey = "eleves_groupe_{$id}_mini_{$miniNumber}";
 
-        $data = $this->cache->get($cacheKey, function (ItemInterface $item) use ($id) {
+        $data = $this->cache->get($cacheKey, function (ItemInterface $item) use ($id, $miniNumber) {
+
             $item->expiresAfter(360000); //  1h de cache
 
             $groupe = $this->em->getRepository(Groupe::class)->find($id);
@@ -42,8 +43,23 @@ class EleveController extends AbstractController
                 ];
             }
 
-            $eleves = $this->em->getRepository(Eleve::class)->findBy(['groupe' => $groupe]);
+            // Déterminer la source des élèves : groupe complet ou mini-groupe
+            $elevesRepo = $this->em->getRepository(Eleve::class);
+            $miniGroupes = $groupe->getGroupeMinis()->toArray();
+            $eleves = [];
 
+            if ($miniNumber === 0 || count($miniGroupes) === 0) {
+                // Tous les élèves du groupe
+                $eleves = $elevesRepo->findBy(['groupe' => $groupe]);
+            } else {
+                $targetMini = $miniGroupes[$miniNumber - 1] ?? null;
+                if ($targetMini) {
+                    $eleves = $elevesRepo->findBy(['groupeMini' => $targetMini]);
+                } else {
+                    // Si index mini invalide
+                    $eleves = $elevesRepo->findBy(['groupe' => $groupe]);
+                }
+            }
             $members = [];
             foreach ($eleves as $eleve) {
                 $relations = [];
@@ -148,6 +164,11 @@ class EleveController extends AbstractController
         }
 
         $eleve->setGroupe($groupe);
+        if($groupe->getGroupeMinis()->count()>0 ){
+            $eleve->setGroupeMini($groupe->getGroupeMinis()->first()); 
+        }else{
+            $eleve->setGroupeMini(null);
+        }
         $this->em->flush();
 
         return $this->json(['success' => "Élève affecté au groupe ".$groupe->getNomFr()]);

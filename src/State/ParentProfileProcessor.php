@@ -33,7 +33,7 @@ class ParentProfileProcessor implements ProcessorInterface
         $user = new User();
         $user->setUsername($data->getCin()); // CIN comme username
         $user->setEmail(null); /// set email
-        $user->setType('parent');
+        $user->setType(User::TYPE_PARENT);
         $user->setRoles(['ROLE_PARENT']);
         $user->setPassword(
             $this->passwordHasher->hashPassword($user, $plainPassword)

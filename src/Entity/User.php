@@ -51,6 +51,12 @@ use Symfony\Component\Serializer\Annotation\Groups;
 ])]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
+
+    public const TYPE_PERSONEL = 'PERSONEL';
+    public const TYPE_PARENT = 'PARENT';
+    public const TYPE_PROF = 'PROF';
+    
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]

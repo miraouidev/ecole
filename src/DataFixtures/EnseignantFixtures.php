@@ -18,7 +18,7 @@ class EnseignantFixtures extends Fixture implements DependentFixtureInterface
         // ✅ getReference fonctionne avec UN SEUL argument maintenant
         $civiliteM = $this->getReference(CiviliteFixtures::CIVILITE_M,Civilite::class);
         $civiliteMme = $this->getReference(CiviliteFixtures::CIVILITE_MME,Civilite::class);
-
+/*
         for ($i = 0; $i < 10; $i++) {
             $enseignant = new Enseignant();
             $enseignant->setCivilite($faker->randomElement([$civiliteM, $civiliteMme]));
@@ -37,6 +37,7 @@ class EnseignantFixtures extends Fixture implements DependentFixtureInterface
         }
 
         $manager->flush();
+        */
     }
 
     public function getDependencies(): array

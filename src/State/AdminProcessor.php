@@ -78,7 +78,7 @@ class AdminProcessor implements ProcessorInterface
         $user = new User();
         $user->setUsername($username);
         $user->setEmail($email);
-        $user->setType($type);
+        $user->setType(User::TYPE_PERSONEL);
         $user->setRoles($roles);
         if (method_exists($user, 'setIsActive')) {
             $user->setIsActive($isActive);

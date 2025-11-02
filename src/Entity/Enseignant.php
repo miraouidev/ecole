@@ -13,15 +13,18 @@ use App\Entity\Traits\IsActiveTrait;
 use App\Entity\Traits\PersonTrait;
 use App\Repository\EnseignantRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: EnseignantRepository::class)]
+#[UniqueEntity(fields: ['nom_ar', 'prenom_ar'], message: 'Cet enseignant existe déjà.')]
 #[ApiResource(
     routePrefix: '/scolaire',
     normalizationContext: ['groups' => ['enseignant:read']],
     denormalizationContext: ['groups' => ['enseignant:write']],
     paginationItemsPerPage: 10,
     paginationClientItemsPerPage: true,
+    paginationClientEnabled: true,
     operations: [
         new Get(),
         new GetCollection(),
@@ -49,6 +52,11 @@ class Enseignant
     #[Groups(['enseignant:read','enseignant:write','enseignant:patch'])]
     private ?Civilite $civilite = null;
 
+    #[ORM\ManyToOne(inversedBy: 'enseignants')]
+    #[ORM\JoinColumn(nullable: false)]
+    #[Groups(['enseignant:read','enseignant:write','enseignant:patch'])]
+    private ?Matieres $matiere = null;
+
     use PersonTrait;
     use IsActiveTrait;
 
@@ -57,6 +65,18 @@ class Enseignant
     public function getCivilite(): ?Civilite { return $this->civilite; }
     public function setCivilite(?Civilite $civilite): static {
         $this->civilite = $civilite;
+        return $this;
+    }
+
+    public function getMatiere(): ?Matieres
+    {
+        return $this->matiere;
+    }
+
+    public function setMatiere(?Matieres $matiere): static
+    {
+        $this->matiere = $matiere;
+
         return $this;
     }
 }

@@ -55,9 +55,16 @@ class AnneeScolaireCourante
     #[Groups(['annee:read'])]
     private Collection $groupes;
 
+    /**
+     * @var Collection<int, Semestre>
+     */
+    #[ORM\OneToMany(targetEntity: Semestre::class, mappedBy: 'anneeScolaire', orphanRemoval: true)]
+    private Collection $semestres;
+
     public function __construct()
     {
         $this->groupes = new ArrayCollection();
+        $this->semestres = new ArrayCollection();
     }
 
     public function getId(): ?int { return $this->id; }
@@ -90,6 +97,36 @@ class AnneeScolaireCourante
                 $groupe->setAnneeScolaire(null);
             }
         }
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Semestre>
+     */
+    public function getSemestres(): Collection
+    {
+        return $this->semestres;
+    }
+
+    public function addSemestre(Semestre $semestre): static
+    {
+        if (!$this->semestres->contains($semestre)) {
+            $this->semestres->add($semestre);
+            $semestre->setAnneeScolaire($this);
+        }
+
+        return $this;
+    }
+
+    public function removeSemestre(Semestre $semestre): static
+    {
+        if ($this->semestres->removeElement($semestre)) {
+            // set the owning side to null (unless already changed)
+            if ($semestre->getAnneeScolaire() === $this) {
+                $semestre->setAnneeScolaire(null);
+            }
+        }
+
         return $this;
     }
 }

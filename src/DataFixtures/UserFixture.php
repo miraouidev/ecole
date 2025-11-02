@@ -19,7 +19,7 @@ class UserFixture extends Fixture
         $admin = new User();
         $admin->setUsername('admin');
         $admin->setEmail('admin@ecole.com');
-        $admin->setType('admin');
+        $admin->setType(User::TYPE_PERSONEL);
         $admin->setRoles(['ROLE_ADMIN']);
         $admin->setPassword(
             $this->passwordHasher->hashPassword($admin, 'admin123')
@@ -30,7 +30,7 @@ class UserFixture extends Fixture
         $parent = new User();
         $parent->setUsername('parent01');
         $parent->setEmail(null);
-        $parent->setType('parent');
+        $parent->setType(User::TYPE_PARENT);
         $parent->setRoles(['ROLE_PARENT']);
         $parent->setPassword(
             $this->passwordHasher->hashPassword($parent, 'parent123')

@@ -73,10 +73,18 @@ class Groupe
     #[ORM\OneToMany(targetEntity: MatiereClasseProf::class, mappedBy: 'groupe')]
     private Collection $matiereClasseProfs;
 
+    /**
+     * @var Collection<int, GroupeMini>
+     */
+    #[ORM\OneToMany(targetEntity: GroupeMini::class, mappedBy: 'groupe', orphanRemoval: true)]
+    #[Groups(['groupe:read'])]
+    private Collection $groupeMinis;
+
     public function __construct()
     {
         $this->eleves = new ArrayCollection();
         $this->matiereClasseProfs = new ArrayCollection();
+        $this->groupeMinis = new ArrayCollection();
     }
 
     public function getId(): ?int { return $this->id; }
@@ -102,4 +110,34 @@ class Groupe
      * @return Collection<int, MatiereClasseProf>
      */
     public function getMatiereClasseProfs(): Collection { return $this->matiereClasseProfs; }
+
+    /**
+     * @return Collection<int, GroupeMini>
+     */
+    public function getGroupeMinis(): Collection
+    {
+        return $this->groupeMinis;
+    }
+
+    public function addGroupeMini(GroupeMini $groupeMini): static
+    {
+        if (!$this->groupeMinis->contains($groupeMini)) {
+            $this->groupeMinis->add($groupeMini);
+            $groupeMini->setGroupe($this);
+        }
+
+        return $this;
+    }
+
+    public function removeGroupeMini(GroupeMini $groupeMini): static
+    {
+        if ($this->groupeMinis->removeElement($groupeMini)) {
+            // set the owning side to null (unless already changed)
+            if ($groupeMini->getGroupe() === $this) {
+                $groupeMini->setGroupe(null);
+            }
+        }
+
+        return $this;
+    }
 }

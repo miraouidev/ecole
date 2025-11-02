@@ -9,6 +9,7 @@ trait IsActiveTrait
 {
     #[ORM\Column(type: 'boolean', options: ['default' => true])]
     #[Groups([
+        'mtn:read', 'mtn:write','mtn:update',
         'siteheader:read', 'siteheader:write',
         'sitereseau:read','sitereseau:write',
         'sitetopimage:read','sitetopimage:write',

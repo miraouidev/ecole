@@ -79,9 +79,26 @@ class Eleve
 
     private Collection $parentEleveRelations;
 
+    #[ORM\ManyToOne(inversedBy: 'eleves')]
+    private ?GroupeMini $groupeMini = null;
+
+    /**
+     * @var Collection<int, NoteEleve>
+     */
+    #[ORM\OneToMany(targetEntity: NoteEleve::class, mappedBy: 'eleve', orphanRemoval: true)]
+    private Collection $noteEleves;
+
+    /**
+     * @var Collection<int, Resultat>
+     */
+    #[ORM\OneToMany(targetEntity: Resultat::class, mappedBy: 'eleve')]
+    private Collection $resultats;
+
     public function __construct()
     {
         $this->parentEleveRelations = new ArrayCollection();
+        $this->noteEleves = new ArrayCollection();
+        $this->resultats = new ArrayCollection();
     }
 
     public function getId(): ?int { return $this->id; }
@@ -125,6 +142,78 @@ class Eleve
                 $parentEleveRelation->setEleve(null);
             }
         }
+        return $this;
+    }
+
+    public function getGroupeMini(): ?GroupeMini
+    {
+        return $this->groupeMini;
+    }
+
+    public function setGroupeMini(?GroupeMini $groupeMini): static
+    {
+        $this->groupeMini = $groupeMini;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, NoteEleve>
+     */
+    public function getNoteEleves(): Collection
+    {
+        return $this->noteEleves;
+    }
+
+    public function addNoteElefe(NoteEleve $noteElefe): static
+    {
+        if (!$this->noteEleves->contains($noteElefe)) {
+            $this->noteEleves->add($noteElefe);
+            $noteElefe->setEleve($this);
+        }
+
+        return $this;
+    }
+
+    public function removeNoteElefe(NoteEleve $noteElefe): static
+    {
+        if ($this->noteEleves->removeElement($noteElefe)) {
+            // set the owning side to null (unless already changed)
+            if ($noteElefe->getEleve() === $this) {
+                $noteElefe->setEleve(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Resultat>
+     */
+    public function getResultats(): Collection
+    {
+        return $this->resultats;
+    }
+
+    public function addResultat(Resultat $resultat): static
+    {
+        if (!$this->resultats->contains($resultat)) {
+            $this->resultats->add($resultat);
+            $resultat->setEleve($this);
+        }
+
+        return $this;
+    }
+
+    public function removeResultat(Resultat $resultat): static
+    {
+        if ($this->resultats->removeElement($resultat)) {
+            // set the owning side to null (unless already changed)
+            if ($resultat->getEleve() === $this) {
+                $resultat->setEleve(null);
+            }
+        }
+
         return $this;
     }
 }
