@@ -9,7 +9,9 @@ use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Patch;
+use App\Entity\Traits\IsActiveTrait;
 use App\Repository\GroupeRepository;
+use App\State\OnlyActiveProvider;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
@@ -24,7 +26,9 @@ use Symfony\Component\Serializer\Annotation\Groups;
     paginationClientItemsPerPage: true,
     operations: [
         new Get(),
-        new GetCollection(),
+        new GetCollection(
+            provider: OnlyActiveProvider::class
+        ),
         new Post(),
         new Patch()
     ]
@@ -35,8 +39,12 @@ use Symfony\Component\Serializer\Annotation\Groups;
     'niveau.id' => 'exact',
     'anneeScolaire.id' => 'exact'
 ])]
+#[ORM\HasLifecycleCallbacks]
+
 class Groupe
 {
+
+    use IsActiveTrait;
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
@@ -80,11 +88,18 @@ class Groupe
     #[Groups(['groupe:read'])]
     private Collection $groupeMinis;
 
+    /**
+     * @var Collection<int, Scolarite>
+     */
+    #[ORM\OneToMany(targetEntity: Scolarite::class, mappedBy: 'groupe')]
+    private Collection $scolarites;
+
     public function __construct()
     {
         $this->eleves = new ArrayCollection();
         $this->matiereClasseProfs = new ArrayCollection();
         $this->groupeMinis = new ArrayCollection();
+        $this->scolarites = new ArrayCollection();
     }
 
     public function getId(): ?int { return $this->id; }
@@ -139,5 +154,43 @@ class Groupe
         }
 
         return $this;
+    }
+
+    /**
+     * @return Collection<int, Scolarite>
+     */
+    public function getScolarites(): Collection
+    {
+        return $this->scolarites;
+    }
+
+    public function addScolarite(Scolarite $scolarite): static
+    {
+        if (!$this->scolarites->contains($scolarite)) {
+            $this->scolarites->add($scolarite);
+            $scolarite->setGroupe($this);
+        }
+
+        return $this;
+    }
+
+    public function removeScolarite(Scolarite $scolarite): static
+    {
+        if ($this->scolarites->removeElement($scolarite)) {
+            // set the owning side to null (unless already changed)
+            if ($scolarite->getGroupe() === $this) {
+                $scolarite->setGroupe(null);
+            }
+        }
+
+        return $this;
+    }
+
+    #[ORM\PrePersist]
+    public function onPrePersist(): void
+    {
+        if ($this->isActive === null) {
+            $this->isActive = true;
+        }
     }
 }

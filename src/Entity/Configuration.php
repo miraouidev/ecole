@@ -40,6 +40,11 @@ class Configuration
     #[Groups(['configuration:read', 'configuration:write', 'configuration:patch'])]
     private ?bool $isModifierTypeNote = false;
 
+
+    #[ORM\Column(options: ['default' => false])]
+    #[Groups(['configuration:read', 'configuration:write', 'configuration:patch'])]
+    private ?bool $isChangeGroup = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -58,6 +63,23 @@ class Configuration
     public function setIsModifierTypeNote(bool $isModifierTypeNote): static
     {
         $this->isModifierTypeNote = $isModifierTypeNote;
+        return $this;
+    }
+
+    public function isChangeGroup(): ?bool
+    {
+        return $this->isChangeGroup;
+    }
+
+    public function getIsChangeGroup(): ?bool
+    {
+        return $this->isChangeGroup;
+    }
+
+    public function setIsChangeGroup(bool $isChangeGroup): static
+    {
+        $this->isChangeGroup = $isChangeGroup;
+
         return $this;
     }
 }

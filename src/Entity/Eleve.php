@@ -94,11 +94,19 @@ class Eleve
     #[ORM\OneToMany(targetEntity: Resultat::class, mappedBy: 'eleve')]
     private Collection $resultats;
 
+    /**
+     * @var Collection<int, Scolarite>
+     */
+    #[ORM\OneToMany(targetEntity: Scolarite::class, mappedBy: 'eleve')]
+    #[Groups(['eleve:read', 'eleve:write','parent:read'])]
+    private Collection $scolarites;
+
     public function __construct()
     {
         $this->parentEleveRelations = new ArrayCollection();
         $this->noteEleves = new ArrayCollection();
         $this->resultats = new ArrayCollection();
+        $this->scolarites = new ArrayCollection();
     }
 
     public function getId(): ?int { return $this->id; }
@@ -211,6 +219,36 @@ class Eleve
             // set the owning side to null (unless already changed)
             if ($resultat->getEleve() === $this) {
                 $resultat->setEleve(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Scolarite>
+     */
+    public function getScolarites(): Collection
+    {
+        return $this->scolarites;
+    }
+
+    public function addScolarite(Scolarite $scolarite): static
+    {
+        if (!$this->scolarites->contains($scolarite)) {
+            $this->scolarites->add($scolarite);
+            $scolarite->setEleve($this);
+        }
+
+        return $this;
+    }
+
+    public function removeScolarite(Scolarite $scolarite): static
+    {
+        if ($this->scolarites->removeElement($scolarite)) {
+            // set the owning side to null (unless already changed)
+            if ($scolarite->getEleve() === $this) {
+                $scolarite->setEleve(null);
             }
         }
 

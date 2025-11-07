@@ -2,10 +2,13 @@
 
 namespace App\Controller;
 
+use App\Entity\AnneeScolaireCourante;
+use App\Entity\Configuration;
 use App\Entity\Eleve;
 use App\Entity\Groupe;
 use App\Entity\ParentEleveRelation;
 use App\Entity\ParentProfile;
+use App\Entity\Scolarite;
 use App\Entity\TypeRelation;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -151,6 +154,11 @@ class EleveController extends AbstractController
             return $this->json(['error' => 'Élève introuvable'], 404);
         }
 
+         // Check configuration
+        $config = $this->em->getRepository(Configuration::class)->findOneBy([]);
+        if (!$config || !$config->isChangeGroup()) {
+            return new JsonResponse(['alert' => 'Merci d’activer Change Class dans la configuration'], 400);
+        }
         $data = json_decode($request->getContent(), true);
         if (!isset($data['groupe'])) {
             return $this->json(['error' => 'Paramètre "groupe" requis'], 400);
@@ -169,6 +177,34 @@ class EleveController extends AbstractController
         }else{
             $eleve->setGroupeMini(null);
         }
+        
+            // 2. Find active academic year
+        $annee = $this->em->getRepository(AnneeScolaireCourante::class)
+            ->findOneBy(['isActive' => true]);
+        if (!$annee) {
+            return $this->json(['error' => 'Aucune année scolaire active trouvée'], 400);
+        }
+
+         // 3. Handle existing scolarité(s)
+        foreach ($eleve->getScolarites() as $oldScol) {
+            if ($oldScol->getAnnee() === $annee) {
+                // Option 1: Delete old record
+                $this->em->remove($oldScol);
+
+                // Option 2 (alternative): just deactivate instead
+                // $oldScol->setIsActive(false);
+            }
+        }
+
+        // 4. Create new Scolarite relation
+        $scolarite = new Scolarite();
+        $scolarite->setEleve($eleve);
+        $scolarite->setGroupe($groupe);
+        $scolarite->setAnnee($annee);
+        $eleve->addScolarite($scolarite);
+        $this->em->persist($scolarite);
+
+
         $this->em->flush();
 
         return $this->json(['success' => "Élève affecté au groupe ".$groupe->getNomFr()]);
@@ -192,6 +228,88 @@ class EleveController extends AbstractController
             'status' => 'success',
             'message' => "Cache cleared for {$deleted} groupes"
         ]);
+    }
+
+    #[Route('/create', name: 'eleve_create', methods: ['POST'])]
+    public function createEleve(Request $request): JsonResponse
+    {
+        $data = json_decode($request->getContent(), true);
+
+        // 1. Validate payload
+        foreach (['nom_fr','prenom_fr','nom_ar','prenom_ar','dateNai','groupe','parentEleveRelations'] as $field) {
+            if (!isset($data[$field])) {
+                return $this->json(['error' => "Champ manquant : $field"], 400);
+            }
+        }
+
+        // 2. Resolve groupe
+        $groupeId = $this->getIdFromIri($data['groupe']);
+        $groupe = $this->em->getRepository(Groupe::class)->find($groupeId);
+        if (!$groupe) {
+            return $this->json(['error' => 'Groupe introuvable'], 404);
+        }
+
+        // 3. Find active school year
+        $annee = $this->em->getRepository(AnneeScolaireCourante::class)->findOneBy(['isActive' => true]);
+        if (!$annee) {
+            return $this->json(['error' => 'Aucune année scolaire active trouvée'], 400);
+        }
+
+        // 4. Create Eleve
+        $eleve = new Eleve();
+        $eleve->setNomFr($data['nom_fr']);
+        $eleve->setPrenomFr($data['prenom_fr']);
+        $eleve->setNomAr($data['nom_ar']);
+        $eleve->setPrenomAr($data['prenom_ar']);
+        $eleve->setDateNai(new \DateTimeImmutable($data['dateNai']));
+        $eleve->setGroupe($groupe);
+
+        // 5. Add parent relations
+        foreach ($data['parentEleveRelations'] as $relationData) {
+            $parentId = $this->getIdFromIri($relationData['parent'] ?? '');
+            $typeId   = $this->getIdFromIri($relationData['typeRelation'] ?? '');
+            if (!$parentId || !$typeId) {
+                return $this->json(['error' => 'Relation parent/type invalide'], 400);
+            }
+
+            $parent = $this->em->getRepository(ParentProfile::class)->find($parentId);
+            $type   = $this->em->getRepository(TypeRelation::class)->find($typeId);
+            if (!$parent || !$type) {
+                return $this->json(['error' => 'Parent ou type de relation introuvable'], 404);
+            }
+
+            $relation = new ParentEleveRelation();
+            $relation->setParent($parent);
+            $relation->setTypeRelation($type);
+            $relation->setEleve($eleve);
+            $this->em->persist($relation);
+            $eleve->addParentEleveRelation($relation);
+        }
+
+        // 6. Create Scolarite record
+        $scolarite = new Scolarite();
+        $scolarite->setEleve($eleve);
+        $scolarite->setGroupe($groupe);
+        $scolarite->setAnnee($annee);
+        $this->em->persist($scolarite);
+        $eleve->addScolarite($scolarite);
+
+        // 7. Save everything
+        $this->em->persist($eleve);
+        $this->em->flush();
+
+        // 8. Return confirmation
+        return $this->json([
+            'success' => true,
+            'message' => sprintf("Élève %s %s ajouté avec succès dans %s (%s)",
+                $eleve->getPrenomFr(),
+                $eleve->getNomFr(),
+                $groupe->getNomFr(),
+                $annee->getNom()
+            ),
+            'eleve_id' => $eleve->getId(),
+            'scolarite_id' => $scolarite->getId()
+        ], 201);
     }
 
 }
