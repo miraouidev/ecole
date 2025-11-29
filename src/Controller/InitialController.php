@@ -75,8 +75,7 @@ class InitialController extends AbstractController
                     $relation = new MatieresTypeNote();
                     $relation->setMatiere($matiere)
                         ->setTypeNote($type)
-                        ->setSemestre($semestre)
-                        ->setCoefficient(0.5);
+                        ->setSemestre($semestre);
                     $this->em->persist($relation);
                     $count++;
                 }
@@ -135,9 +134,9 @@ class InitialController extends AbstractController
 
         // Créer 3 semestres
         $semestresData = [
-            ['number' => 1, 'nom_fr' => 'Premier Semestre', 'nom_ar' => 'الفصل الأول'],
-            ['number' => 2, 'nom_fr' => 'Deuxième Semestre', 'nom_ar' => 'الفصل الثاني'],
-            ['number' => 3, 'nom_fr' => 'Troisième Semestre', 'nom_ar' => 'الفصل الثالث'],
+            ['number' => 1, 'nom_fr' => 'Premier Trimestre', 'nom_ar' => 'ثلاثي الأول'],
+            ['number' => 2, 'nom_fr' => 'Deuxième Trimestre', 'nom_ar' => 'ثلاثي الثاني'],
+            ['number' => 3, 'nom_fr' => 'Troisième Trimestre', 'nom_ar' => 'ثلاثي الثالث'],
         ];
 
         foreach ($semestresData as $data) {
@@ -147,7 +146,7 @@ class InitialController extends AbstractController
             $semestre->setNomAr($data['nom_ar']);
             $semestre->setAnneeScolaire($annee);
 
-            // Seul le premier semestre est actif
+            // Seul le premier Trimestre est actif
             if ($data['number'] === 1) {
                 $semestre->setIsRemplie(true);
                 $semestre->setIsAffiche(true);

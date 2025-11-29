@@ -50,9 +50,16 @@ class Niveau
     #[ORM\OneToMany(targetEntity: NiveauMatiere::class, mappedBy: 'Niveau', orphanRemoval: true)]
     private Collection $niveauMatieres;
 
+    /**
+     * @var Collection<int, MatiereNiveau>
+     */
+    #[ORM\OneToMany(targetEntity: MatiereNiveau::class, mappedBy: 'niveau', orphanRemoval: true)]
+    private Collection $matiereNiveaux;
+
     public function __construct()
     {
         $this->niveauMatieres = new ArrayCollection();
+        $this->matiereNiveaux = new ArrayCollection();
     }
 
     use IsActiveTrait;
@@ -92,6 +99,36 @@ class Niveau
             // set the owning side to null (unless already changed)
             if ($niveauMatiere->getNiveau() === $this) {
                 $niveauMatiere->setNiveau(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, MatiereNiveau>
+     */
+    public function getMatiereNiveaux(): Collection
+    {
+        return $this->matiereNiveaux;
+    }
+
+    public function addMatiereNiveau(MatiereNiveau $matiereNiveau): static
+    {
+        if (!$this->matiereNiveaux->contains($matiereNiveau)) {
+            $this->matiereNiveaux->add($matiereNiveau);
+            $matiereNiveau->setNiveau($this);
+        }
+
+        return $this;
+    }
+
+    public function removeMatiereNiveau(MatiereNiveau $matiereNiveau): static
+    {
+        if ($this->matiereNiveaux->removeElement($matiereNiveau)) {
+            // set the owning side to null (unless already changed)
+            if ($matiereNiveau->getNiveau() === $this) {
+                $matiereNiveau->setNiveau(null);
             }
         }
 

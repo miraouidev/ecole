@@ -37,7 +37,8 @@ class AdminResetPasswordController extends AbstractController
     public function updateRoles(
         User $user,
         Request $request,
-        EntityManagerInterface $em
+        EntityManagerInterface $em,
+        \App\Repository\RoleAppRepository $roleAppRepository
     ): JsonResponse {
         $this->denyAccessUnlessGranted('ROLE_ADMIN'); // only admins can do this
 
@@ -48,8 +49,9 @@ class AdminResetPasswordController extends AbstractController
             return $this->json(['error' => 'Missing or invalid roles array'], 400);
         }
 
-        // Restrict allowed roles (security!)
-        $allowedRoles = ['ROLE_USER', 'ROLE_ADMIN', 'ROLE_MANAGER'];
+        // Restrict allowed roles (security!) - Fetch from database
+        $roleAppEntities = $roleAppRepository->findAll();
+        $allowedRoles = array_map(fn($roleApp) => $roleApp->getCode(), $roleAppEntities);
 
         $filteredRoles = array_values(array_intersect($roles, $allowedRoles));
 

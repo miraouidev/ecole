@@ -55,7 +55,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
             security: "is_granted('ROLE_ADMIN')"
         ),
     ],
-    routePrefix: '/scolarite',
+    routePrefix: '/scolaire',
 )]
 #[ApiFilter(SearchFilter::class, properties: [
     'matiere.id' => 'exact',
@@ -83,10 +83,6 @@ class MatieresTypeNote
     #[ORM\JoinColumn(nullable: false)]
     #[Groups(['mtn:read', 'mtn:write'])]
     private ?Semestre $semestre = null;
-
-    #[ORM\Column(nullable: true)]
-    #[Groups(['mtn:read', 'mtn:write', 'mtn:update'])]
-    private ?float $coefficient = null;
 
     use \App\Entity\Traits\IsActiveTrait;
 
@@ -128,14 +124,4 @@ class MatieresTypeNote
         return $this;
     }
 
-    public function getCoefficient(): ?float
-    {
-        return $this->coefficient;
-    }
-
-    public function setCoefficient(?float $coefficient): static
-    {
-        $this->coefficient = $coefficient;
-        return $this;
-    }
 }

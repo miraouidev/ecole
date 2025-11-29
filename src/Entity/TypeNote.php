@@ -51,6 +51,10 @@ class TypeNote
     #[Groups(['typeNote:read', 'typeNote:write','mtn:read'])]
     private ?bool $forAll = null;
 
+    #[ORM\Column(length: 20, unique: true, nullable: true)]
+    #[Groups(['typeNote:read', 'typeNote:write','mtn:read'])]
+    private ?string $code = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -87,6 +91,17 @@ class TypeNote
     {
         $this->forAll = $forAll;
 
+        return $this;
+    }
+
+    public function getCode(): ?string
+    {
+        return $this->code;
+    }
+
+    public function setCode(?string $code): static
+    {
+        $this->code = $code ? strtoupper($code) : null;
         return $this;
     }
 }

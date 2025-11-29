@@ -31,7 +31,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
             security: "is_granted('ROLE_ADMIN')"
         ),
     ],
-    routePrefix: '/scolarite',
+    routePrefix: '/scolaire',
 )]
 #[ApiFilter(SearchFilter::class, properties: [
     'anneeScolaire.id' => 'exact'

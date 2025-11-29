@@ -7,7 +7,20 @@ use App\Repository\NoteEleveRepository;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: NoteEleveRepository::class)]
-#[ApiResource]
+#[ApiResource(
+    operations: [
+        new \ApiPlatform\Metadata\Get(),
+        new \ApiPlatform\Metadata\GetCollection(),
+        new \ApiPlatform\Metadata\Post(),
+        new \ApiPlatform\Metadata\Patch(),
+        new \ApiPlatform\Metadata\Delete(),
+        new \ApiPlatform\Metadata\Post(
+            uriTemplate: '/notes/bulk',
+            controller: \App\Controller\GradeEntryController::class,
+            name: 'grade_entry_bulk'
+        )
+    ]
+)]
 class NoteEleve
 {
     #[ORM\Id]
@@ -17,9 +30,6 @@ class NoteEleve
 
     #[ORM\Column(nullable: true)]
     private ?float $valeur = null;
-
-    #[ORM\Column(nullable: true)]
-    private ?float $coefficient = null;
 
     #[ORM\ManyToOne(inversedBy: 'noteEleves')]
     #[ORM\JoinColumn(nullable: false)]
@@ -42,18 +52,6 @@ class NoteEleve
     public function setValeur(?float $valeur): static
     {
         $this->valeur = $valeur;
-
-        return $this;
-    }
-
-    public function getCoefficient(): ?float
-    {
-        return $this->coefficient;
-    }
-
-    public function setCoefficient(?float $coefficient): static
-    {
-        $this->coefficient = $coefficient;
 
         return $this;
     }
